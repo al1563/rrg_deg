@@ -13,7 +13,7 @@ def load_data():
     # Function to safely read a CSV file
     def read_data(path):
         try:
-            return pd.read_csv(path)
+            return pd.read_csv(path, low_memory=False)
         except FileNotFoundError:
             st.warning(f"File not found: {path}")
             return None
@@ -143,7 +143,7 @@ with tab1:
         fig_volcano = px.scatter(
             filtered_dge,
             x="avg_log2FC",
-            y=-np.log10(filtered_dge['p_val_adj']),
+            y=-np.log10(filtered_dge['p_val_adj']+min(filtered_dge['p_val_adj'][filtered_dge['p_val_adj'] > 0])),
             color="significant",
             color_discrete_map={"Significant": "#d62728", "Not Significant": "grey"},
             hover_name="gene",
@@ -154,12 +154,12 @@ with tab1:
         fig_volcano.add_vline(x=-logfc_cutoff, line_dash="dash", line_color="grey")
         fig_volcano.add_hline(y=pval_cutoff_log, line_dash="dash", line_color="grey")
         fig_volcano.update_layout(showlegend=False, height=600)
-        st.plotly_chart(fig_volcano, use_container_width=True)
+        st.plotly_chart(fig_volcano, width=True)
 
         st.subheader("DGE Results Table")
         st.dataframe(
             filtered_dge[['gene', 'avg_log2FC', 'p_val_adj']].round(3),
-            use_container_width=True
+            width=True
         )
 
 # --- Tab 2: GSEA Pathway View and Table ---
@@ -176,12 +176,10 @@ with tab2:
         st.warning("No GSEA data available for the current selection.")
     else:
         st.subheader("GSEA Pathway Enrichment")
-        filtered_gsea['-log10(padj)'] = -np.log10(filtered_gsea['padj'])
         fig_gsea = px.scatter(
             filtered_gsea,
             x="NES",
             y="pathway",
-            #size="-log10(padj)",
             color="NES",
             color_continuous_scale="RdBu_r",
             color_continuous_midpoint = 0,
@@ -193,10 +191,10 @@ with tab2:
             yaxis={'categoryorder':'total ascending'},
             height=600
         )
-        st.plotly_chart(fig_gsea, use_container_width=True)
+        st.plotly_chart(fig_gsea, width=True)
 
         st.subheader("GSEA Results Table")
         st.dataframe(
             filtered_gsea[['path_name', 'reference', 'NES', 'padj', 'Lead_genes','Tag %','Gene %']].round(3),
-            use_container_width=True
+            width=True
         )
