@@ -31,7 +31,7 @@ def load_data():
             df['dataset'] = name
             dge_list.append(df)
     all_dge = pd.concat(dge_list, ignore_index=True).rename(columns={'cell': 'cell_type'})
-    all_dge = all_dge[['gene', 'avg_log2FC','p_val_adj', 'cell_type', 'comp1', 'comp2', 'neg_log10_pvals_adj']]
+    all_dge = all_dge[['dataset', 'gene', 'avg_log2FC','p_val_adj', 'cell_type', 'comp1', 'comp2', 'neg_log10_pvals_adj']]
 
 
     # Load all GSEA files
@@ -47,7 +47,7 @@ def load_data():
             df['dataset'] = name
             gsea_list.append(df)
     all_gsea = pd.concat(gsea_list, ignore_index=True).rename(columns={'Term': 'pathway', 'FDR q-val': 'padj'})
-    all_gsea = all_gsea[['pathway', 'NES', 'padj', 'Tag %', 'Gene %', 'Lead_genes', 'cell_type', 'comp1', 'comp2', 'reference', 'path_name']]
+    all_gsea = all_gsea[['dataset','pathway', 'NES', 'padj', 'Tag %', 'Gene %', 'Lead_genes', 'cell_type', 'comp1', 'comp2', 'reference', 'path_name']]
 
 
     return all_dge, all_gsea
